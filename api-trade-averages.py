@@ -31,7 +31,7 @@ def getGranularitySeconds(granularity):
 ## Calculates the SMA over 'period' candles of size 'granularity' for pair 'pair'
 def SMA(period, granularity, pair):
     conn = httplib.HTTPSConnection("api-sandbox.oanda.com")
-    url = ''.join(["/v1/instruments/", pair, "/candles?count=", str(period + 1), "&granularity=", str(granularity)])
+    url = ''.join(["/v1/history?instruments=", pair, "count=", str(period + 1), "&granularity=", str(granularity)])
     conn.request("GET", url)
     candles = json.loads(conn.getresponse().read())['candles']
     candlewidth = getGranularitySeconds(granularity)
@@ -60,7 +60,7 @@ def SMA(period, granularity, pair):
 ## Calculates the WMA over 'period' candles of size 'granularity' for pair 'pair'
 def WMA(period, granularity, pair):
     conn = httplib.HTTPSConnection("api-sandbox.oanda.com")
-    url = ''.join(["/v1/instruments/", pair, "/candles?count=", str(period + 1), "&granularity=", str(granularity)])
+    url = ''.join(["/v1/history?instruments=", pair, "&count=", str(period + 1), "&granularity=", str(granularity)])
     conn.request("GET", url)
     resp = json.loads(conn.getresponse().read())
     candles = resp['candles']
