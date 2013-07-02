@@ -94,6 +94,8 @@ def WMA(period, granularity, pair):
 
 ## This will loop indefinitely, making trades when the averages cross
 def compareAndTrade(period, granularity, pair, account):
+    headers = {"Content-Type" : "application/x-www-form-urlencoded"}
+    url = ''.join(["/v1/accounts/", account, "/trades"])
     if SMA(period, granularity, pair) < WMA(period, granularity, pair):
         state = 'rising'
     else:
@@ -103,8 +105,8 @@ def compareAndTrade(period, granularity, pair, account):
             if SMA(period, granularity, pair) > WMA(period, granularity, pair):
                 state = 'falling'
                 conn = httplib.HTTPConnection("api-sandbox.oanda.com")
-                url = ''.join(["/v1/accounts/", account, "/trades?units=50&side=sell&instrument=", pair])
-                print url
++               data = "units=50&side=sell&instrument=%s" % pair
++               print data
                 try:
                     conn.request("POST", url)
                     print conn.getresponse().read()
@@ -113,8 +115,8 @@ def compareAndTrade(period, granularity, pair, account):
             if SMA(period, granularity, pair) < WMA(period, granularity, pair):
                 state = 'rising'
                 conn = httplib.HTTPConnection("api-sandbox.oanda.com")
-                url = ''.join(["/v1/accounts/", account, "/trades?units=50&side=buy&instrument=", pair])
-                print url
+                data = "units=50&side=buy&instrument=%s" % pair
+                print data
                 try:
                     conn.request("POST", url)
                     print conn.getresponse().read()
