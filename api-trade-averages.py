@@ -3,6 +3,7 @@ import urllib
 import json
 import sys
 import time
+import calendar
 
 ## Input Required: period granularity instrument account
 
@@ -31,7 +32,7 @@ def getGranularitySeconds(granularity):
 ## Calculates the SMA over 'period' candles of size 'granularity' for pair 'pair'
 def SMA(period, granularity, pair):
     conn = httplib.HTTPSConnection("api-sandbox.oanda.com")
-    url = ''.join(["/v1/history?instrument=", pair, "count=", str(period + 1), "&granularity=", str(granularity)])
+    url = ''.join(["/v1/history?instrument=", pair, "count=", str(period + 1), "&granularity=", str(granularity), "&candleFormat=midpoint"])
     conn.request("GET", url)
     candles = json.loads(conn.getresponse().read())['candles']
     candlewidth = getGranularitySeconds(granularity)
@@ -40,11 +41,12 @@ def SMA(period, granularity, pair):
     count = 0
     oldest = now - (period * candlewidth)
     for candle in candles:
-        if candle['time'] < oldest:
+        candleTime = calendar.timegm(time.strptime(candle['time'], '%Y-%m-%dT%H:%M:%SZ'))
+        if candleTime < oldest:
             oldprice = candle['closeMid']
             continue
         else:
-            while oldest < candle['time']:
+            while oldest < candleTime:
                 finalsma += oldprice
                 count += 1
                 oldest += candlewidth
@@ -60,7 +62,7 @@ def SMA(period, granularity, pair):
 ## Calculates the WMA over 'period' candles of size 'granularity' for pair 'pair'
 def WMA(period, granularity, pair):
     conn = httplib.HTTPSConnection("api-sandbox.oanda.com")
-    url = ''.join(["/v1/history?instrument=", pair, "&count=", str(period + 1), "&granularity=", str(granularity)])
+    url = ''.join(["/v1/history?instrument=", pair, "&count=", str(period + 1), "&granularity=", str(granularity), "&candleFormat=midpoint"])
     conn.request("GET", url)
     resp = json.loads(conn.getresponse().read())
     candles = resp['candles']
@@ -70,11 +72,12 @@ def WMA(period, granularity, pair):
     count = 0
     oldest = now - (period * candlewidth)
     for candle in candles:
-        if candle['time'] < oldest:
+        candleTime = calendar.timegm(time.strptime(candle['time'], '%Y-%m-%dT%H:%M:%SZ'))
+        if candleTime < oldest:
             oldprice = candle['closeMid']
             continue
         else:
-            while oldest < candle['time']:
+            while oldest < candleTime:
                 count += 1
                 finalsma += oldprice * count
                 oldest += candlewidth
@@ -91,7 +94,6 @@ def WMA(period, granularity, pair):
 
 ## This will loop indefinitely, making trades when the averages cross
 def compareAndTrade(period, granularity, pair, account):
-    conn = httplib.HTTPConnection("api-sandbox.oanda.com")
     if SMA(period, granularity, pair) < WMA(period, granularity, pair):
         state = 'rising'
     else:
