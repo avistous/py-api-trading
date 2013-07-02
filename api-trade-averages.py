@@ -105,8 +105,8 @@ def compareAndTrade(period, granularity, pair, account):
             if SMA(period, granularity, pair) > WMA(period, granularity, pair):
                 state = 'falling'
                 conn = httplib.HTTPConnection("api-sandbox.oanda.com")
-+               data = "units=50&side=sell&instrument=%s" % pair
-+               print data
+                data = "units=50&side=sell&instrument=%s" % pair
+                print data
                 try:
                     conn.request("POST", url)
                     print conn.getresponse().read()
