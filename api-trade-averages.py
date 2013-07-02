@@ -103,7 +103,7 @@ def compareAndTrade(period, granularity, pair, account):
             if SMA(period, granularity, pair) > WMA(period, granularity, pair):
                 state = 'falling'
                 conn = httplib.HTTPConnection("api-sandbox.oanda.com")
-                url = ''.join(["/v1/accounts/", account, "/trades?units=50&direction=short&instrument=", pair])
+                url = ''.join(["/v1/accounts/", account, "/trades?units=50&direction=sell&instrument=", pair])
                 print url
                 try:
                     conn.request("POST", url)
@@ -113,7 +113,7 @@ def compareAndTrade(period, granularity, pair, account):
             if SMA(period, granularity, pair) < WMA(period, granularity, pair):
                 state = 'rising'
                 conn = httplib.HTTPConnection("api-sandbox.oanda.com")
-                url = ''.join(["/v1/accounts/", account, "/trades?units=50&direction=long&instrument=", pair])
+                url = ''.join(["/v1/accounts/", account, "/trades?units=50&direction=buy&instrument=", pair])
                 print url
                 try:
                     conn.request("POST", url)
