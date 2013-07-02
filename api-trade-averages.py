@@ -108,7 +108,7 @@ def compareAndTrade(period, granularity, pair, account):
                 data = "units=50&side=sell&instrument=%s" % pair
                 print data
                 try:
-                    conn.request("POST", url)
+                    conn.request("POST", url, data, headers)
                     print conn.getresponse().read()
                 except: pass
         elif state == 'falling':
@@ -118,7 +118,7 @@ def compareAndTrade(period, granularity, pair, account):
                 data = "units=50&side=buy&instrument=%s" % pair
                 print data
                 try:
-                    conn.request("POST", url)
+                    conn.request("POST", url, data, headers)
                     print conn.getresponse().read()
                 except: pass
         time.sleep(period - 1)
